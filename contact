@@ -1,0 +1,288 @@
+<?php
+session_start();
+$message_sent = false;
+
+// Check if the form is submitted
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $message_sent = true;
+}
+?><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Us - Movie Booking</title>
+  <style>
+    /* Global Styles */
+   body {
+    background: url('images/c.jpg') no-repeat center center fixed, #1e1e2d; /* Add the image first, and fallback to the dark color */
+    background-size: cover; /* Ensures the background image covers the entire viewport */
+    color: white;
+    font-family: 'Poppins', sans-serif;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    min-height: 100vh;
+ 
+}
+
+
+    /* Navbar */
+    .navbar {
+        background: #222;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 5%;
+        position: fixed;
+        top: 0;
+        width: 100%;
+        z-index: 1000;
+    }
+
+    .nav-left {
+        display: flex;
+        gap: 15px;
+    }
+
+    .nav-left a, .nav-right a {
+        color: white;
+        text-decoration: none;
+        padding: 10px 15px;
+        font-weight: bold;
+        transition: 0.3s;
+    }
+
+    .nav-left a:hover, .nav-right a:hover {
+        background: #ff4500;
+        border-radius: 5px;
+    }
+
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    position: relative;
+    left: -90px; /* Adjust this value as needed */
+}
+
+
+    /* Profile Dropdown */
+    .profile-menu {
+        position: relative;
+        display: inline-block;
+margin-right: 90px;
+
+
+    }
+
+    .profile-btn {
+        cursor: pointer;
+        padding: 10px 15px;
+        color: white;
+        font-weight: bold;
+    }
+
+    .profile-content {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background-color: #222;
+        min-width: 150px;
+        border-radius: 8px;
+        box-shadow: 0px 4px 8px rgba(255, 255, 255, 0.2);
+        z-index: 999;
+        padding: 5px 0;
+    }
+
+    .profile-content a {
+        color: white;
+        padding: 12px 16px;
+        display: block;
+        text-align: left;
+        transition: background 0.3s;
+    }
+
+    .profile-content a:hover {
+        background-color: #ff4500;
+    }
+
+    .profile-menu:hover .profile-content {
+        display: block;
+    }
+
+   
+
+   /* Contact Section */
+.container {
+    max-width: 600px;
+    margin: 100px 0 40px 0; /* Adjust margins to remove centering */
+    background: transparent;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(255, 255, 255, 0.2);
+    text-align: left;
+    position: relative; /* Allow for positioning */
+    left: 30px; /* Align it to the left */
+ min-height: 100%; /* Ensure the content container stretches to at least the full height */
+    padding-bottom: 50px; /* Add space for the footer */
+}
+
+    /* Contact Info */
+    .contact-info {
+        margin-bottom: 20px;
+    }
+
+    .contact-info p {
+        font-size: 18px;
+        margin: 8px 0;
+        color: #fff;
+    }
+
+    /* Form */
+    .contact-form {
+        display: <?php echo $message_sent ? 'none' : 'block'; ?>; /* Hide form after submission */
+    }
+
+/* Form Labels */
+.contact-form label {
+    display: block;
+    margin-top: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    color: white; /* Light gray for better visibility */
+}
+
+/* Form Inputs & Textarea */
+.contact-form input, .contact-form textarea {
+    width: 95%;
+    padding: 12px;
+    margin-top: 5px;
+    border-radius: 6px;
+    border: 1px solid #444; /* Visible border */
+    font-size: 16px;
+    background:  #FFFFF0; /* Dark background */
+    color: black; /* White text */
+}
+
+.contact-form textarea {
+    height: 120px;
+    resize: none;
+}
+
+/* Submit Button */
+.contact-form button {
+    background-color: #ff4500;
+    color: white;
+    padding: 12px;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    width: 100%;
+    border-radius: 6px;
+    margin-top: 10px;
+    font-weight: bold;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.contact-form button:hover {
+    background-color: #e63e00;
+    transform: scale(1.05); /* Slight pop effect */
+}
+  
+
+    /* Success Message */
+    .success-message {
+        display: <?php echo $message_sent ? 'block' : 'none'; ?>;
+        background: #28a745;
+        color: white;
+        padding: 12px;
+        margin-top: 15px;
+        border-radius: 6px;
+        text-align: center;
+        font-size: 18px;
+        font-weight: bold;
+        box-shadow: 0px 4px 8px rgba(0, 255, 0, 0.3);
+    }
+
+footer {
+    background-color: #222;
+    color: white;
+    padding: 20px;
+    text-align: center;
+    font-size: 14px;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+    margin-top: auto;
+}
+html, body {
+    height: 100%; /* Ensure the body takes up the full height of the viewport */
+    margin: 0;
+}
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="nav-left">
+      <a href="index.php">Home</a>
+      <a href="movies.php">Movies</a>
+      <a href="about.php">About Us</a>
+      <a href="contact.php" class="active">Contact</a>
+    </div>
+    <div class="nav-right">
+    <?php if (isset($_SESSION['user_id'])): ?>
+        <div class="profile-menu">
+            <a href="#" class="profile-btn">Profile ▼</a>
+            <div class="profile-content">
+                <a href="profile.php">My Profile</a>
+                <a href="my_tickets.php">My Bookings</a>
+                <a href="logout.php">Logout</a>
+            </div>
+        </div>
+    <?php else: ?>
+        <a href="register.php">Register</a> <!-- Added Register option -->
+        <a href="login.php">Login</a>
+    <?php endif; ?>
+</div>
+</nav>
+
+  <!-- Contact Section -->
+  <div class="container">
+    <h1>Contact Us</h1>
+    
+    <div class="contact-info">
+      <p><strong>📍 Address:</strong> 123 Movie Street, Bangalore, Karnataka - 560001</p>
+      <p><strong>📧 Email:</strong> support@moviebooking.com</p>
+      <p><strong>📞 Phone:</strong> +91 98765 43210</p>
+      <p><strong>🕒 Working Hours:</strong> Mon - Sun, 9:00 AM - 10:00 PM</p>
+    </div>
+
+    <!-- Contact Form (Hidden After Submission) -->
+    <form class="contact-form" method="post">
+      <label for="name">Name:</label>
+      <input type="text" id="name" name="name" required>
+
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" required>
+
+      <label for="message">Message:</label>
+      <textarea id="message" name="message" required></textarea>
+
+      <button type="submit">Send Message</button>
+    </form>
+
+    <!-- Success Message -->
+    <div class="success-message">
+      ✅ Message Sent Successfully!
+    </div>
+  </div>
+ <footer class="footer">
+    <p>&copy; 2025 Movie Booking. All Rights Reserved.</p>
+  </footer>
+
+</body>
+</html>
