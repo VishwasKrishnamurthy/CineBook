@@ -1,0 +1,314 @@
+Purpose
+
+Show list of all movies available for booking.
+
+Tables Used
+
+movies
+
+SQL Operation
+
+✅ SELECT only
+
+SELECT movie_id, name, poster, status, genre, duration 
+FROM movies;
+
+Why
+
+Movie is not created here
+
+Admin already inserted movies earlier
+
+Displayed on UI
+
+Movie poster
+
+Movie name
+
+Status (Released / Upcoming)
+
+“View Details” button → links to movie_details.php?movie_id=
+
+2️⃣ movie_details.php
+Purpose
+
+Show details of one selected movie + available languages.
+
+Tables Used
+
+movies
+
+showtimes
+
+SQL Operations
+
+✅ SELECT
+
+Movie details
+SELECT name, description, trailer_link, cast, languages, status
+FROM movies
+WHERE movie_id = ?;
+
+Languages actually available for booking
+SELECT DISTINCT language
+FROM showtimes
+WHERE movie_id = ?;
+
+WHY TWO TABLES?
+
+movies.languages = marketing info
+
+showtimes.language = real shows available
+
+Booking must rely on showtimes
+
+Displayed on UI
+
+Movie name, description, cast
+
+Trailer
+
+Language buttons (Telugu, Kannada, etc.)
+
+3️⃣ select_theater.php
+Purpose
+
+After choosing language → show theaters & show timings
+
+Tables Used
+
+movies
+
+theaters
+
+showtimes
+
+SQL Operations
+
+✅ SELECT
+
+SELECT t.theater_id, t.name, t.address,
+       s.show_id, s.show_date, s.show_time
+FROM theaters t
+JOIN showtimes s ON t.theater_id = s.theater_id
+WHERE s.movie_id = ?
+  AND s.language = ?;
+
+Displayed on UI
+
+Theater name
+
+City
+
+Show date
+
+Show time buttons
+
+Nothing is inserted yet
+
+User is still browsing
+
+4️⃣ seat_selection.php
+Purpose
+
+Allow user to select seats and show seat availability
+
+Tables Used
+
+theaters
+
+showtimes
+
+bookings
+
+SQL Operations
+
+✅ SELECT
+
+Seat pricing
+SELECT total_seats, silver_price, gold_price, platinum_price
+FROM theaters t
+JOIN showtimes s ON t.theater_id = s.theater_id
+WHERE s.show_id = ?;
+
+Already booked seats
+SELECT seat_numbers
+FROM bookings
+WHERE show_id = ?
+  AND show_date = ?
+  AND show_time = ?;
+
+WHY bookings table here?
+
+To block already booked seats
+
+Prevent double booking visually
+
+Displayed on UI
+
+Seat layout
+
+Booked seats (disabled)
+
+Selected seats
+
+Live price calculation
+
+5️⃣ booking_summary.php
+Purpose
+
+Show final confirmation before payment
+
+Tables Used
+
+movies
+
+theaters
+
+SQL Operations
+
+✅ SELECT
+
+SELECT name FROM movies WHERE movie_id = ?;
+SELECT name FROM theaters WHERE theater_id = ?;
+
+Displayed on UI
+
+Movie name
+
+Theater
+
+Show date & time
+
+Selected seats
+
+Ticket price + GST
+
+Important
+
+🚫 No INSERT yet
+Payment not done → no booking stored
+
+6️⃣ payment.php
+Purpose
+
+Collect payment method & details
+
+Tables Used
+
+NONE (UI only)
+
+SQL Operations
+
+🚫 None
+
+Why
+
+Just preparing data
+
+Actual payment happens in next page
+
+7️⃣ payment_process.php
+Purpose
+
+🚨 CRITICAL TRANSACTION PAGE
+
+Tables Used
+
+bookings
+
+payments
+
+STEP 1: Prevent double booking
+SELECT seat_numbers
+FROM bookings
+WHERE show_id = ?
+  AND show_date = ?
+  AND show_time = ?;
+
+
+✔ Converts seat_numbers to array
+✔ Checks overlap
+✔ Stops booking if seat already taken
+
+STEP 2: INSERT into payments
+INSERT INTO payments
+(email, show_id, seat_numbers, amount, payment_method,
+ payment_status, transaction_id)
+VALUES (?, ?, ?, ?, ?, 'Success', ?);
+
+
+👉 Payment is stored first
+
+STEP 3: INSERT into bookings
+INSERT INTO bookings
+(email, movie_id, theater_id, show_id, show_date, show_time,
+ seat_numbers, total_price, status, payment_id)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Confirmed', ?);
+
+
+👉 Booking references payment_id
+
+Why this order?
+
+No payment → no booking
+
+Maintains ACID consistency
+
+8️⃣ success.php
+Purpose
+
+Show final ticket
+
+Tables Used
+
+bookings
+
+movies
+
+theaters
+
+showtimes
+
+payments
+
+SQL Operation
+
+✅ SELECT with JOIN
+
+SELECT b.booking_id, m.name, m.poster,
+       t.name, b.show_date, s.show_time,
+       s.language, b.seat_numbers,
+       b.total_price, p.payment_method,
+       p.transaction_id
+FROM bookings b
+JOIN movies m ON b.movie_id = m.movie_id
+JOIN theaters t ON b.theater_id = t.theater_id
+JOIN showtimes s ON b.show_id = s.show_id
+JOIN payments p ON b.payment_id = p.payment_id
+WHERE b.booking_id = ?;
+
+Displayed on UI
+
+Movie poster
+
+Booking ID
+
+Seats
+
+Language
+
+Payment method
+
+QR Code
+
+SUMMARY TABLE (INTERVIEW GOLD)
+Page	SELECT	INSERT
+movies.php	movies	❌
+movie_details.php	movies, showtimes	❌
+select_theater.php	theaters, showtimes	❌
+seat_selection.php	bookings, showtimes	❌
+booking_summary.php	movies, theaters	❌
+payment.php	❌	❌
+payment_process.php	bookings	payments, bookings
+success.php	ALL (JOIN)	❌
