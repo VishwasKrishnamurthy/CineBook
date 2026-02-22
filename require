@@ -1,0 +1,26 @@
+require('dotenv').config(); // Ensure this is at the top
+
+const cloudinary = require('cloudinary').v2;
+
+// Configuring Cloudinary using the URL from .env
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_COULD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,  // Hardcoded API key
+  api_secret: process.env.CLOUDINARY_API_SECRET,  // Hardcoded API secret
+});
+
+console.log("CLOUDINARY_URL:", process.env.CLOUDINARY_URL);
+
+
+
+
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const storage = new CloudinaryStorage({
+    cloudinary,
+    params: {
+        folder: 'wanderlust_DEV',
+        allowed_formats: ["png", "jpg", "jpeg"],  // Ensure formats are correct
+    },
+});
+
+module.exports = { cloudinary, storage };
